@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About & Contact — {{ FATHER_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:1.5rem;padding-bottom:2rem">
+  <div class="about-card">
+    <span class="logo-circle logo-circle-lg">
+      <img src="{% static 'images/logo.png' %}?v=3" width="200" height="200" alt="{{ FATHER_NAME }}">
+    </span>
+    <h1>{{ FATHER_NAME_HI }}</h1>
+    <p class="about-en">{{ FATHER_NAME }}</p>
+    <p style="font-size:1.2rem">
+      <span data-i18n="hero_real_estate">Real Estate — Vidarbha</span>
+      ({{ FATHER_OWNER }}).
+      <span data-i18n="about_body1">We help families find plots, flats, houses, shops and farms with clear photos and area (sq ft). Call or WhatsApp for price.</span>
+    </p>
+    <p data-i18n="about_body2">
+      You can browse the full website without registering. When you like a property, tap I’m Interested — register or login with mobile and password, then we can call you.
+    </p>
+
+    <div class="contact-row">
+      <a class="btn btn-call btn-block" href="{{ call_link }}">📞 Call +91 {{ FATHER_PHONE }}</a>
+      <a class="btn btn-wa btn-block" href="{{ whatsapp_link }}" target="_blank" rel="noopener" data-i18n="chat_wa">Chat on WhatsApp</a>
+      <a class="btn btn-primary btn-block" href="{% url 'properties:list' %}" data-i18n="see_properties">See properties</a>
+    </div>
+
+    <p class="help-tip" style="margin-top:1.5rem" data-i18n="about_serving">
+      Serving Nagpur, Amravati, Akola, Yavatmal, Wardha, Chandrapur, Bhandara, Gondia, Washim and all Vidarbha.
+    </p>
+    <p class="help-tip" style="margin-top:1rem">
+      <a href="{% url 'dashboard:login' %}" data-i18n="broker_login">Broker login</a>
+      <span data-i18n="broker_only"> (for property owner only)</span>
+    </p>
+  </div>
+</div>
+{% endblock %}

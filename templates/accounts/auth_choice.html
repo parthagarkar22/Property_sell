@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Continue — Register or Login{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="form-card">
+    <h1 data-i18n="auth_almost">Almost done</h1>
+    <p class="hint" data-i18n="auth_hint">
+      To send “I’m Interested” to the broker, please register or login with your mobile number and password.
+    </p>
+    <div class="auth-choice">
+      <a class="btn btn-primary btn-block" href="{% url 'accounts:register' %}?next={{ next|urlencode }}" data-i18n="auth_register">
+        New here — Register
+      </a>
+      <a class="btn btn-secondary btn-block" href="{% url 'accounts:login' %}?next={{ next|urlencode }}" data-i18n="auth_login">
+        Already registered — Login
+      </a>
+      <a class="btn btn-outline btn-block" href="{% if next %}{{ next }}{% else %}{% url 'properties:home' %}{% endif %}" data-i18n="auth_back">
+        Go back
+      </a>
+    </div>
+    <p class="help-tip" data-i18n="auth_tip">Large buttons · Mobile + password · Easy for everyone</p>
+  </div>
+</div>
+{% endblock %}

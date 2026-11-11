@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}My Interested Properties{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:1.25rem">
+  <div class="section-head">
+    <div>
+      <h2 data-i18n="interests_title">My interested properties</h2>
+      <p data-i18n="interests_sub">The broker has your number for these listings</p>
+    </div>
+  </div>
+
+  {% if interests %}
+  <div class="property-grid">
+    {% for interest in interests %}
+      {% with property=interest.property %}
+      <article class="property-card">
+        <a class="thumb" href="{% url 'properties:detail' property.pk %}">
+          {% if property.primary_image %}
+            <img src="{{ property.primary_image.image.url }}" alt="{{ property.title }}" loading="lazy">
+          {% endif %}
+          <span class="badge card-badge badge-{{ property.deal_status }}" data-i18n="status_{{ property.deal_status }}">{{ property.get_deal_status_display }}</span>
+        </a>
+        <div class="body">
+          <h3><a href="{% url 'properties:detail' property.pk %}">{{ property.title }}</a></h3>
+          <p class="meta">📍 {{ property.location_display }}</p>
+          <p class="price price-on-request"><span data-i18n="call_for_price">Call for price</span></p>
+          <p class="meta"><strong data-i18n="interest_sent">Interest Sent ✔</strong> · {{ interest.get_status_display }}</p>
+          <a class="btn btn-outline" href="{% url 'properties:detail' property.pk %}" data-i18n="open_property">Open property</a>
+        </div>
+      </article>
+      {% endwith %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <p><strong data-i18n="empty_no_interest">You have not marked any property yet.</strong></p>
+    <p class="help-tip" data-i18n="empty_tap_interest">Open a property and tap “I’m Interested”.</p>
+    <a class="btn btn-primary" href="{% url 'properties:list' %}" data-i18n="browse_properties">Browse properties</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

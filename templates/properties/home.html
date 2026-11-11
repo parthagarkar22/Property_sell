@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}{{ FATHER_NAME }} — Properties in Vidarbha{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-a" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-b" aria-hidden="true"></div>
+  <div class="container hero-row">
+    <div class="hero-copy">
+      <p class="hero-eyebrow" data-i18n="hero_eyebrow">Trusted local broker · Vidarbha, Maharashtra</p>
+      <h1 class="hero-hi">{{ FATHER_NAME_HI }}</h1>
+      <p class="hero-en">{{ FATHER_NAME }}</p>
+      <p class="hero-desc">
+        <span data-i18n="hero_real_estate">Real Estate — Vidarbha</span>
+        ({{ FATHER_OWNER }}).
+        <span data-i18n="hero_desc">Find plots, flats, houses &amp; farms. Call anytime — no login needed to browse.</span>
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'properties:list' %}" data-i18n="hero_see_all">See all properties</a>
+        <a class="btn btn-ghost" href="{{ call_link }}">📞 {{ FATHER_PHONE }}</a>
+        <a class="btn btn-ghost" href="{{ whatsapp_link }}" target="_blank" rel="noopener" data-i18n="whatsapp">WhatsApp</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <span class="logo-circle logo-circle-xl">
+        <img src="{% static 'images/logo.png' %}?v=3" width="300" height="300" alt="{{ FATHER_NAME }} logo">
+      </span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  {% if featured %}
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2 data-i18n="featured_title">Featured properties</h2>
+        <p data-i18n="featured_sub">Hand-picked listings in Vidarbha</p>
+      </div>
+    </div>
+    <div class="property-grid">
+      {% for property in featured %}
+        {% include "properties/_property_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2 data-i18n="latest_title">Latest properties</h2>
+        <p data-i18n="latest_sub">Newly added across Vidarbha</p>
+      </div>
+      <a class="btn btn-outline" href="{% url 'properties:list' %}" data-i18n="view_all">View all</a>
+    </div>
+    {% if recent %}
+    <div class="property-grid">
+      {% for property in recent %}
+        {% include "properties/_property_card.html" %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <p><strong data-i18n="empty_no_props">No properties yet.</strong></p>
+      <p class="help-tip" data-i18n="empty_ask_broker">Ask the broker to add listings from the dashboard.</p>
+      <a class="btn btn-call" href="{{ call_link }}" data-i18n="call_now">Call now</a>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

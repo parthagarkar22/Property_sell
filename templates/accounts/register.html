@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Register — Vidarbha Properties{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="form-card">
+    <h1 data-i18n="register_title">Register</h1>
+    <p class="hint" data-i18n="register_hint">Enter your name, mobile number and a password.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-group">
+        <label for="name" data-i18n="label_name">Your full name</label>
+        <input type="text" id="name" name="name" value="{{ name|default:'' }}" required autocomplete="name" data-i18n-placeholder="ph_name" placeholder="e.g. Ramesh Patil">
+      </div>
+      <div class="form-group">
+        <label for="phone" data-i18n="label_phone">Mobile number</label>
+        <input type="tel" id="phone" name="phone" value="{{ phone|default:'' }}" required
+               inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10"
+               autocomplete="tel" data-i18n-placeholder="ph_phone" placeholder="10-digit number">
+      </div>
+      <div class="form-group">
+        <label for="password" data-i18n="label_password">Password</label>
+        <div class="pw-field">
+          <input type="password" id="password" name="password" required
+                 autocomplete="new-password" data-i18n-placeholder="ph_password" placeholder="Strong password"
+                 aria-describedby="pwRules">
+          {% include "includes/password_toggle.html" with target="password" %}
+        </div>
+        <ul class="pw-rules" id="pwRules">
+          <li data-rule="length" data-i18n="pw_len">At least 8 characters</li>
+          <li data-rule="upper" data-i18n="pw_upper">One uppercase letter (A–Z)</li>
+          <li data-rule="lower" data-i18n="pw_lower">One lowercase letter (a–z)</li>
+          <li data-rule="digit" data-i18n="pw_digit">One number (0–9)</li>
+          <li data-rule="special" data-i18n="pw_special">One special character (!@#$)</li>
+        </ul>
+      </div>
+      <div class="form-group">
+        <label for="password2" data-i18n="label_password2">Confirm password</label>
+        <div class="pw-field">
+          <input type="password" id="password2" name="password2" required
+                 autocomplete="new-password" data-i18n-placeholder="ph_password2" placeholder="Enter password again">
+          {% include "includes/password_toggle.html" with target="password2" %}
+        </div>
+        <ul class="pw-rules">
+          <li data-rule="match" data-i18n="pw_match">Both passwords match</li>
+        </ul>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="btn_register">Create account</button>
+    </form>
+    <p class="help-tip">
+      <span data-i18n="already_reg">Already registered?</span>
+      <a href="{% url 'accounts:login' %}?next={{ next|urlencode }}" data-i18n="login_here">Login here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

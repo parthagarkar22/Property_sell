@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}All Properties — Vidarbha{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:1.25rem">
+  <div class="section-head">
+    <div>
+      <h2 data-i18n="list_title">All properties</h2>
+      <p data-i18n="list_sub">Vidarbha properties · Browse freely</p>
+    </div>
+  </div>
+
+  <div class="filter-panel">
+    <button type="button" class="filter-toggle" id="filterToggle" data-i18n="show_filters">🔍 Show filters</button>
+    <form method="get" id="filterFields" class="filter-fields">
+      <div>
+        <label for="q" data-i18n="label_search">Search</label>
+        <input type="text" id="q" name="q" value="{{ filters.q }}" data-i18n-placeholder="ph_search" placeholder="Society, road, keyword">
+      </div>
+      <div>
+        <label for="area" data-i18n="label_area">Area</label>
+        <select id="area" name="area">
+          <option value="" data-i18n="all_areas">All areas</option>
+          {% for value, label in areas %}
+            <option value="{{ value }}" {% if filters.area == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="type" data-i18n="label_type">Property type</label>
+        <select id="type" name="type">
+          <option value="" data-i18n="all_types">All types</option>
+          {% for value, label in types %}
+            <option value="{{ value }}" {% if filters.type == value %}selected{% endif %} data-i18n="type_{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="status" data-i18n="label_status">Status</label>
+        <select id="status" name="status">
+          <option value="" data-i18n="any_status">Any status</option>
+          {% for value, label in statuses %}
+            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %} data-i18n="status_{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:end">
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="apply_filters">Apply filters</button>
+      </div>
+      <div style="display:flex;align-items:end">
+        <a class="btn btn-outline btn-block" href="{% url 'properties:list' %}" data-i18n="clear">Clear</a>
+      </div>
+    </form>
+  </div>
+
+  {% if properties %}
+  <div class="property-grid">
+    {% for property in properties %}
+      {% include "properties/_property_card.html" %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <p><strong data-i18n="empty_no_match">No properties match your filters.</strong></p>
+    <p class="help-tip" data-i18n="empty_try_clear">Try clearing filters or call the broker for help.</p>
+    <a class="btn btn-call" href="{{ call_link }}" data-i18n="call_broker">📞 Call broker</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

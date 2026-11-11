@@ -1,0 +1,29 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Broker Login — {{ FATHER_NAME }}{% endblock %}
+
+{% block content %}
+<div class="dash-login-box">
+  <span class="logo-circle logo-circle-lg" style="display:flex;margin:0 auto 1rem">
+    <img src="{% static 'images/logo.png' %}?v=3" width="200" height="200" alt="{{ FATHER_NAME }}">
+  </span>
+  <h1 style="text-align:center">Broker Login</h1>
+  <p style="color:#4d5c56;margin-top:0;text-align:center">{{ FATHER_NAME_HI }}<br>Only for adding &amp; managing properties.</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="dash-field">
+      <label for="id_phone">Mobile number</label>
+      {{ form.phone }}
+    </div>
+    <div class="dash-field">
+      <label for="id_password">Password</label>
+      {{ form.password }}
+    </div>
+    <button type="submit" class="dash-btn dash-btn-primary dash-btn-block">Login to dashboard</button>
+  </form>
+  <p style="margin-top:1.25rem;color:#4d5c56;font-size:1rem">
+    Looking for properties? <a href="{% url 'properties:home' %}">Go to website</a>
+  </p>
+</div>
+{% endblock %}

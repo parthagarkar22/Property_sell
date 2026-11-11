@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Interest Sent{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:1.5rem;padding-bottom:2rem">
+  <div class="form-card" style="max-width:520px">
+    <h1 data-i18n="interest_saved_title">Interest saved ✔</h1>
+    <p class="hint">
+      <span data-i18n="label_property">Property:</span> <strong>{{ property.title }}</strong><br>
+      {{ property.location_display }}
+    </p>
+    <p style="margin:0 0 1rem" data-i18n="interest_saved_hint">
+      Tap the button below once, then tap Send in WhatsApp.
+      (Only this one property will be in the message.)
+    </p>
+    <a class="btn btn-wa btn-block" href="{{ wa_url }}" target="_blank" rel="noopener" data-i18n="send_interest_wa">
+      Send interest on WhatsApp
+    </a>
+    <a class="btn btn-outline btn-block" href="{% url 'properties:my_interests' %}" style="margin-top:0.75rem" data-i18n="my_interested_props">
+      My interested properties
+    </a>
+    <a class="btn btn-outline btn-block" href="{% url 'properties:list' %}" style="margin-top:0.5rem" data-i18n="browse_more_props">
+      Browse more properties
+    </a>
+  </div>
+</div>
+{% endblock %}

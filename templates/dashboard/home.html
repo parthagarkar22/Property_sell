@@ -1,0 +1,41 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard Home{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">Hello, {{ user.name }}</h1>
+<p class="dash-sub">Manage Vidarbha properties and customer interests here.</p>
+
+<div class="dash-stats">
+  <div class="dash-stat"><strong>{{ stats.properties }}</strong><span>Total properties</span></div>
+  <div class="dash-stat"><strong>{{ stats.active }}</strong><span>Visible on website</span></div>
+  <div class="dash-stat"><strong>{{ stats.new_interests }}</strong><span>New interests</span></div>
+  <div class="dash-stat"><strong>{{ stats.total_interests }}</strong><span>All interests</span></div>
+</div>
+
+<div class="dash-actions">
+  <a class="dash-btn dash-btn-primary" href="{% url 'dashboard:property_easy_add' %}">＋ मेसेजने प्रॉपर्टी जोडा</a>
+  <a class="dash-btn dash-btn-brand" href="{% url 'dashboard:interest_list' %}?status=new">New customer interests</a>
+  <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_list' %}">All properties</a>
+  <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_add' %}">Full form</a>
+</div>
+
+<div class="dash-card">
+  <h2>Latest customer interests</h2>
+  {% if recent_interests %}
+    {% for i in recent_interests %}
+      <div class="interest-mobile">
+        <p><strong>{{ i.customer.name }}</strong> · {{ i.customer.phone }}</p>
+        <p>{{ i.property.title }}</p>
+        <p><span class="badge badge-{{ i.status }}">{{ i.get_status_display }}</span>
+          · {{ i.created_at|date:"d M Y, h:i A" }}</p>
+        <p><a class="dash-btn dash-btn-outline" href="tel:+91{{ i.customer.phone }}">📞 Call customer</a></p>
+      </div>
+    {% endfor %}
+    <a class="dash-btn dash-btn-brand" href="{% url 'dashboard:interest_list' %}">See all interests</a>
+  {% else %}
+    <div class="empty-box">No interests yet. When a customer taps “I’m Interested”, it will show here.</div>
+  {% endif %}
+</div>
+{% endblock %}

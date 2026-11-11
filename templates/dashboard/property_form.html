@@ -1,0 +1,199 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}{% if property_obj %}Edit property{% else %}Add property{% endif %}{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">{% if property_obj %}Edit property{% else %}Add new property{% endif %}</h1>
+<p class="dash-sub">Fill the form in simple steps. Photos can be added below.</p>
+
+{% if not property_obj %}
+<p class="dash-actions" style="margin-top:0">
+  <a class="dash-btn dash-btn-primary" href="{% url 'dashboard:property_easy_add' %}">मेसेजने जोडा (सोपे)</a>
+</p>
+{% endif %}
+
+{% if from_message %}
+<div class="flash flash-info">
+  मेसेजमधून फॉर्म भरला आहे. खाली तपासा व <strong>Add property</strong> दाबा.
+  {% if parsed_warnings %}
+    <ul style="margin:.5rem 0 0;padding-left:1.2rem">
+      {% for w in parsed_warnings %}<li>{{ w }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if property_obj %}
+<form method="post" action="{% url 'dashboard:property_from_message' property_obj.pk %}" class="dash-card easy-update-card">
+  {% csrf_token %}
+  <h2>मेसेजने अपडेट करा</h2>
+  <p class="dash-hint" style="margin-top:0">नवीन WhatsApp मेसेज पेस्ट करा — टायटल, लोकेशन, चौ.फुट इ. अपडेट होतील. जुनी किंमत ठेवली जाते जर मेसेजमध्ये नसेल.</p>
+  <div class="dash-field">
+    <label for="update_message">मेसेज</label>
+    <textarea class="dash-input easy-message" id="update_message" name="message" rows="5" placeholder="अपडेट मेसेज इथे पेस्ट करा…"></textarea>
+  </div>
+  <button type="submit" class="dash-btn dash-btn-brand">मेसेजनुसार अपडेट</button>
+</form>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="dash-card"{% if from_message %} action="{% url 'dashboard:property_add' %}"{% endif %}>
+  {% csrf_token %}
+
+  {% if form.errors %}
+    <div class="flash flash-error">
+      खालील फील्ड तपासा / Fix these fields:
+      <ul class="dash-error-list" style="margin:.5rem 0 0">
+        {% for field in form %}
+          {% if field.errors %}
+            <li><strong>{{ field.label }}</strong>: {{ field.errors|striptags }}</li>
+          {% endif %}
+        {% endfor %}
+        {% for err in form.non_field_errors %}
+          <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="dash-field{% if form.title.errors %} has-error{% endif %}">
+    <label for="{{ form.title.id_for_label }}">Title *</label>
+    {{ form.title }}
+    {% if form.title.errors %}<div class="field-error">{{ form.title.errors|striptags }}</div>{% endif %}
+  </div>
+
+  <div class="dash-field{% if form.description.errors %} has-error{% endif %}">
+    <label for="{{ form.description.id_for_label }}">Details</label>
+    {{ form.description }}
+    {% if form.description.errors %}<div class="field-error">{{ form.description.errors|striptags }}</div>{% endif %}
+  </div>
+
+  <div class="dash-grid-2">
+    <div class="dash-field{% if form.area.errors %} has-error{% endif %}">
+      <label for="{{ form.area.id_for_label }}">Area (Vidarbha) *</label>
+      {{ form.area }}
+      {% if form.area.errors %}<div class="field-error">{{ form.area.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.location_detail.errors %} has-error{% endif %}">
+      <label for="{{ form.location_detail.id_for_label }}">Landmark / society</label>
+      {{ form.location_detail }}
+      {% if form.location_detail.errors %}<div class="field-error">{{ form.location_detail.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.property_type.errors %} has-error{% endif %}">
+      <label for="{{ form.property_type.id_for_label }}">Type *</label>
+      {{ form.property_type }}
+      {% if form.property_type.errors %}<div class="field-error">{{ form.property_type.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.deal_status.errors %} has-error{% endif %}">
+      <label for="{{ form.deal_status.id_for_label }}">Status *</label>
+      {{ form.deal_status }}
+      {% if form.deal_status.errors %}<div class="field-error">{{ form.deal_status.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field" id="sqft-field">
+      <label for="{{ form.sq_ft.id_for_label }}">Square feet *</label>
+      {{ form.sq_ft }}
+      {% if form.sq_ft.errors %}<div class="field-error">{{ form.sq_ft.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field" id="bhk-field" hidden>
+      <label for="{{ form.bhk.id_for_label }}">BHK *</label>
+      {{ form.bhk }}
+      <small style="color:#4d5c56">Flats are listed as 1 BHK, 2 BHK, 3 BHK, and so on.</small>
+      {% if form.bhk.errors %}<div class="field-error">{{ form.bhk.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field" id="acres-field" hidden>
+      <label for="{{ form.acres.id_for_label }}">Acres *</label>
+      {{ form.acres }}
+      <small style="color:#4d5c56">Farms are measured in acres, not square feet.</small>
+      {% if form.acres.errors %}<div class="field-error">{{ form.acres.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.price_per_sq_ft.errors %} has-error{% endif %}">
+      <label id="price-rate-label" for="{{ form.price_per_sq_ft.id_for_label }}">Price / sq ft (optional, hidden on site)</label>
+      {{ form.price_per_sq_ft }}
+      <small style="color:#4d5c56">Website shows “Call for price” — leave blank</small>
+      {% if form.price_per_sq_ft.errors %}<div class="field-error">{{ form.price_per_sq_ft.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.total_price.errors %} has-error{% endif %}">
+      <label for="{{ form.total_price.id_for_label }}">Total price (optional, hidden on site)</label>
+      {{ form.total_price }}
+      <small style="color:#4d5c56">Not shown to customers</small>
+      {% if form.total_price.errors %}<div class="field-error">{{ form.total_price.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.youtube_url.errors %} has-error{% endif %}">
+      <label for="{{ form.youtube_url.id_for_label }}">YouTube video link</label>
+      {{ form.youtube_url }}
+      {% if form.youtube_url.errors %}<div class="field-error">{{ form.youtube_url.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="dash-field{% if form.maps_url.errors %} has-error{% endif %}">
+      <label for="{{ form.maps_url.id_for_label }}">Google Maps link</label>
+      {{ form.maps_url }}
+      {% if form.maps_url.errors %}<div class="field-error">{{ form.maps_url.errors|striptags }}</div>{% endif %}
+    </div>
+  </div>
+
+  <label class="dash-check-row">{{ form.is_active }} Show on website</label>
+  <label class="dash-check-row">{{ form.is_featured }} Featured on home page</label>
+
+  <div class="dash-field" style="margin-top:1rem">
+    <label for="images">Add photos</label>
+    <input class="dash-input" type="file" id="images" name="images" accept="image/*" multiple>
+    <small style="color:#4d5c56">You can select more than one photo at once.</small>
+  </div>
+
+  <div class="dash-actions">
+    <button type="submit" class="dash-btn dash-btn-primary">{% if property_obj %}Save changes{% else %}Add property{% endif %}</button>
+    <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_list' %}">Cancel</a>
+  </div>
+</form>
+
+{% if property_obj and images %}
+<div class="dash-card">
+  <h2>Photos</h2>
+  <div class="dash-photos">
+    {% for img in images %}
+    <div class="dash-photo">
+      <img src="{{ img.image.url }}" alt="Property photo">
+      <div class="tools">
+        {% if img.is_primary %}
+          <span class="badge badge-available">Main photo</span>
+        {% else %}
+          <form method="post" action="{% url 'dashboard:image_set_primary' img.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="dash-btn dash-btn-outline dash-btn-block" style="min-height:42px;font-size:0.95rem">Set as main</button>
+          </form>
+        {% endif %}
+        <form method="post" action="{% url 'dashboard:image_delete' img.pk %}" onsubmit="return confirm('Remove this photo?');">
+          {% csrf_token %}
+          <button type="submit" class="dash-btn dash-btn-danger dash-btn-block" style="min-height:42px;font-size:0.95rem">Remove</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+<script>
+  (function () {
+    var typeInput = document.getElementById("id_property_type");
+    var sqField = document.getElementById("sqft-field");
+    var acreField = document.getElementById("acres-field");
+    var bhkField = document.getElementById("bhk-field");
+    var rateLabel = document.getElementById("price-rate-label");
+    if (!typeInput || !sqField || !acreField || !bhkField) return;
+
+    function syncAreaUnit() {
+      var farm = typeInput.value === "farm";
+      var flat = typeInput.value === "flat";
+      sqField.hidden = farm || flat;
+      acreField.hidden = !farm;
+      bhkField.hidden = !flat;
+      if (rateLabel) {
+        rateLabel.textContent = farm
+          ? "Price / acre (optional, hidden on site)"
+          : "Price / sq ft (optional, hidden on site)";
+      }
+    }
+
+    typeInput.addEventListener("change", syncAreaUnit);
+    syncAreaUnit();
+  })();
+</script>
+{% endblock %}

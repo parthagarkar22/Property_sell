@@ -1,0 +1,45 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Customer Interests{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">Customer interests</h1>
+<p class="dash-sub">When someone taps “I’m Interested”, they appear here. Call them and update status.</p>
+
+<div class="dash-actions">
+  <a class="dash-btn {% if not status_filter %}dash-btn-brand{% else %}dash-btn-outline{% endif %}" href="{% url 'dashboard:interest_list' %}">All</a>
+  {% for value, label in status_choices %}
+    <a class="dash-btn {% if status_filter == value %}dash-btn-brand{% else %}dash-btn-outline{% endif %}"
+       href="{% url 'dashboard:interest_list' %}?status={{ value }}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if interests %}
+  {% for i in interests %}
+  <div class="interest-mobile">
+    <p><strong style="font-size:1.2rem">{{ i.customer.name }}</strong></p>
+    <p>📱 {{ i.customer.phone }}</p>
+    <p>🏠 {{ i.property.title }}</p>
+    <p>📅 {{ i.created_at|date:"d M Y, h:i A" }}</p>
+    <p>
+      <a class="dash-btn dash-btn-brand" href="tel:+91{{ i.customer.phone }}">📞 Call</a>
+      <a class="dash-btn dash-btn-outline" href="https://wa.me/91{{ i.customer.phone }}" target="_blank" rel="noopener">WhatsApp</a>
+    </p>
+    <form method="post" action="{% url 'dashboard:interest_status' i.pk %}" style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:end">
+      {% csrf_token %}
+      <div style="flex:1;min-width:160px">
+        <label for="status-{{ i.pk }}"><strong>Status</strong></label>
+        <select class="dash-input dash-status" name="status" id="status-{{ i.pk }}">
+          {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if i.status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="dash-btn dash-btn-primary">Update</button>
+    </form>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-box">No interests in this list yet.</div>
+{% endif %}
+{% endblock %}

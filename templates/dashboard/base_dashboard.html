@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Broker Dashboard — {{ FATHER_NAME }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=8">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=2">
+</head>
+<body class="dash-body">
+  {% if user.is_authenticated and user.is_staff %}
+  <header class="dash-top">
+    <div class="dash-wrap dash-top-inner">
+      <a class="dash-brand" href="{% url 'dashboard:home' %}" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none">
+        <span class="logo-circle logo-circle-sm">
+          <img src="{% static 'images/logo.png' %}?v=3" width="52" height="52" alt="">
+        </span>
+        <span>
+          Broker Panel
+          <small>{{ FATHER_NAME }}</small>
+        </span>
+      </a>
+      <nav class="dash-nav" aria-label="Dashboard">
+        <a href="{% url 'dashboard:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a>
+        <a href="{% url 'dashboard:property_list' %}" {% if 'property' in request.resolver_match.url_name %}class="active"{% endif %}>Properties</a>
+        <a href="{% url 'dashboard:interest_list' %}" {% if 'interest' in request.resolver_match.url_name %}class="active"{% endif %}>Interests</a>
+        <a href="{% url 'properties:home' %}" target="_blank">View website</a>
+        <form method="post" action="{% url 'dashboard:logout' %}" style="margin:0">
+          {% csrf_token %}
+          <button type="submit" class="danger">Logout</button>
+        </form>
+      </nav>
+    </div>
+  </header>
+  {% endif %}
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash flash-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <main class="dash-main">
+    <div class="dash-wrap">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</body>
+</html>

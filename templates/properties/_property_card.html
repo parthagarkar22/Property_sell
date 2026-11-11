@@ -1,0 +1,24 @@
+{% load humanize %}
+<article class="property-card">
+  <a class="thumb" href="{% url 'properties:detail' property.pk %}" aria-label="{{ property.title }}">
+    {% if property.primary_image %}
+      <img src="{{ property.primary_image.image.url }}" alt="{{ property.title }}" loading="lazy">
+    {% else %}
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='440'%3E%3Crect fill='%23d5e2db' width='640' height='440'/%3E%3Ctext x='50%25' y='50%25' fill='%230a5c4d' font-size='28' text-anchor='middle' dy='.3em' font-family='sans-serif'%3ENo photo yet%3C/text%3E%3C/svg%3E" alt="No photo" data-i18n-aria="no_photo">
+    {% endif %}
+    <span class="badge card-badge badge-{{ property.deal_status }}" data-i18n="status_{{ property.deal_status }}">{{ property.get_deal_status_display }}</span>
+  </a>
+  <div class="body">
+    <h3><a href="{% url 'properties:detail' property.pk %}">{{ property.title }}</a></h3>
+    <p class="meta">📍 {{ property.location_display }}</p>
+    <p class="meta">
+      <span data-i18n="type_{{ property.property_type }}">{{ property.get_property_type_display }}</span>
+      · {{ property.area_figure }} <span data-i18n="{{ property.area_unit }}">{% if property.area_unit == "bhk" %}BHK{% elif property.area_unit == "acres" %}acres{% else %}sq ft{% endif %}</span>
+    </p>
+    <p class="price price-on-request">
+      <span data-i18n="call_for_price">Call for price</span>
+      <small data-i18n="ask_broker">Ask broker</small>
+    </p>
+    <a class="btn btn-primary" href="{% url 'properties:detail' property.pk %}" data-i18n="view_details">View details</a>
+  </div>
+</article>

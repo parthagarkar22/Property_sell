@@ -1,0 +1,51 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load humanize %}
+
+{% block title %}Properties — Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">Properties</h1>
+<p class="dash-sub">Add, edit or hide listings for Vidarbha.</p>
+
+<div class="dash-actions">
+  <a class="dash-btn dash-btn-primary" href="{% url 'dashboard:property_easy_add' %}">＋ मेसेजने जोडा</a>
+  <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_add' %}">Full form</a>
+</div>
+
+<form method="get" class="dash-card" style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:end">
+  <div style="flex:1;min-width:200px">
+    <label for="q"><strong>Search</strong></label>
+    <input class="dash-input" type="text" id="q" name="q" value="{{ q }}" placeholder="Title or location">
+  </div>
+  <button class="dash-btn dash-btn-brand" type="submit">Search</button>
+</form>
+
+{% if properties %}
+  {% for p in properties %}
+  <div class="dash-card">
+    <h3 style="margin-bottom:.35rem">{{ p.title }}</h3>
+    <p style="margin:.25rem 0;color:#4d5c56">
+      {{ p.location_display }} · {{ p.get_property_type_display }} ·
+      <span class="badge badge-{{ p.deal_status }}">{{ p.get_deal_status_display }}</span>
+    </p>
+    <p style="margin:.25rem 0"><strong>किंमत: कॉल करा / Call for price</strong>
+      · {{ p.area_figure }} {% if p.area_unit == "bhk" %}BHK{% elif p.area_unit == "acres" %}acres{% else %}sq ft{% endif %} · {{ p.image_count }} photo(s)
+      {% if not p.is_active %}· <strong style="color:#991b1b">Hidden</strong>{% endif %}
+    </p>
+    <div class="dash-actions" style="margin:0.75rem 0 0">
+      <a class="dash-btn dash-btn-brand" href="{% url 'dashboard:property_edit' p.pk %}">✏️ Edit</a>
+      <a class="dash-btn dash-btn-outline" href="{% url 'properties:detail' p.pk %}" target="_blank">View on website</a>
+      <form method="post" action="{% url 'dashboard:property_delete' p.pk %}" onsubmit="return confirm('Delete this property?');" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="dash-btn dash-btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-box">
+    <p><strong>No properties found.</strong></p>
+    <a class="dash-btn dash-btn-primary" href="{% url 'dashboard:property_easy_add' %}">मेसेजने पहिली प्रॉपर्टी जोडा</a>
+  </div>
+{% endif %}
+{% endblock %}

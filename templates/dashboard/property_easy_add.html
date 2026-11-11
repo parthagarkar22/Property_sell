@@ -1,0 +1,47 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}मेसेजने प्रॉपर्टी जोडा{% endblock %}
+
+{% block content %}
+<h1 class="dash-title">मेसेजने प्रॉपर्टी जोडा</h1>
+<p class="dash-sub">WhatsApp मेसेज पेस्ट करा → सेव्ह. किंमत वेबसाइटवर दिसणार नाही — ग्राहक कॉल/WhatsApp करतील.</p>
+
+<form method="post" enctype="multipart/form-data" class="dash-card easy-add-card">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="flash flash-error">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="dash-field">
+    <label for="{{ form.message.id_for_label }}">① मेसेज पेस्ट करा *</label>
+    {{ form.message }}
+    {{ form.message.errors }}
+    <small class="dash-hint">उदा. कॉमर्सियल प्लॉट… 50×90=4500 स्क्वेअर फुट… अमरावती</small>
+  </div>
+
+  <div class="dash-field">
+    <label for="images">② फोटो (ऐच्छिक)</label>
+    <input class="dash-input" type="file" id="images" name="images" accept="image/*" multiple>
+    <small class="dash-hint">एकत्र अनेक फोटो निवडू शकता.</small>
+  </div>
+
+  <div class="dash-actions" style="margin-bottom:0">
+    <button type="submit" class="dash-btn dash-btn-primary dash-btn-block" style="font-size:1.25rem;min-height:56px">
+      ✓ प्रॉपर्टी सेव्ह करा
+    </button>
+    <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_add' %}">पूर्ण फॉर्म (English)</a>
+    <a class="dash-btn dash-btn-outline" href="{% url 'dashboard:property_list' %}">रद्द</a>
+  </div>
+</form>
+
+<div class="dash-card">
+  <h2>कसे वापरायचे?</h2>
+  <ol class="easy-steps">
+    <li>WhatsApp मधील प्रॉपर्टी मेसेज कॉपी करा</li>
+    <li>वरच्या बॉक्समध्ये पेस्ट करा</li>
+    <li>हवे असल्यास फोटो निवडा</li>
+    <li><strong>सेव्ह</strong> दाबा — किंमत साइटवर दिसणार नाही; ग्राहक तुम्हाला कॉल करतील</li>
+  </ol>
+</div>
+{% endblock %}
