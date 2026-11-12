@@ -18,7 +18,10 @@
     </div>
     <div class="dash-field">
       <label for="id_password">Password</label>
-      {{ form.password }}
+      <div class="pw-field">
+        {{ form.password }}
+        {% include "includes/password_toggle.html" with target="id_password" %}
+      </div>
     </div>
     <button type="submit" class="dash-btn dash-btn-primary dash-btn-block">Login to dashboard</button>
   </form>
@@ -26,4 +29,17 @@
     Looking for properties? <a href="{% url 'properties:home' %}">Go to website</a>
   </p>
 </div>
+<script>
+  function togglePassword(btn) {
+    var field = btn.closest(".pw-field");
+    var input = (field && field.querySelector("input")) || document.getElementById(btn.getAttribute("data-target"));
+    if (!input) return;
+    var show = input.getAttribute("type") !== "text";
+    var value = input.value;
+    input.setAttribute("type", show ? "text" : "password");
+    input.value = value;
+    btn.classList.toggle("is-visible", show);
+    btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+  }
+</script>
 {% endblock %}
