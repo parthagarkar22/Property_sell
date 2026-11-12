@@ -1,15 +1,32 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
+# Existing environment variables win, so Vercel settings are not replaced by a local .env file.
+load_dotenv(override=False)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key-change-me")
 DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+if not DEBUG and SECRET_KEY == "django-insecure-dev-key-change-me":
+    raise ImproperlyConfigured("Set SECRET_KEY before deploying with DEBUG=False.")
+
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+if ".vercel.app" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(".vercel.app")
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if not DEBUG and "https://*.vercel.app" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://*.vercel.app")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -18,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "storages",
     "django.contrib.humanize",
     "accounts",
     "properties",
@@ -26,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -54,12 +73,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+if DATABASE_URL:
+    # conn_max_age 0: each Vercel request is short-lived.
+    # Server-side cursors and prepared statements break Supabase's transaction pooler (port 6543).
+    DATABASES = {"default": dj_database_url.config(default=DATABASE_URL, conn_max_age=0, ssl_require=True)}
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+    DATABASES["default"].setdefault("OPTIONS", {})
+    DATABASES["default"]["OPTIONS"]["prepare_threshold"] = None
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -80,6 +113,33 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+
+SUPABASE_S3_ACCESS_KEY = os.getenv("SUPABASE_S3_ACCESS_KEY", "").strip()
+SUPABASE_S3_SECRET_KEY = os.getenv("SUPABASE_S3_SECRET_KEY", "").strip()
+SUPABASE_S3_ENDPOINT = os.getenv("SUPABASE_S3_ENDPOINT", "").strip().rstrip("/")
+SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "property-photos").strip() or "property-photos"
+SUPABASE_REGION = os.getenv("SUPABASE_REGION", "ap-south-1").strip() or "ap-south-1"
+
+if SUPABASE_S3_ACCESS_KEY and SUPABASE_S3_SECRET_KEY and SUPABASE_S3_ENDPOINT:
+    AWS_ACCESS_KEY_ID = SUPABASE_S3_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY = SUPABASE_S3_SECRET_KEY
+    AWS_STORAGE_BUCKET_NAME = SUPABASE_BUCKET
+    AWS_S3_ENDPOINT_URL = SUPABASE_S3_ENDPOINT
+    AWS_S3_REGION_NAME = SUPABASE_REGION
+    AWS_S3_ADDRESSING_STYLE = "path"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
+    _supabase_host = urlparse(SUPABASE_S3_ENDPOINT).netloc
+    AWS_S3_CUSTOM_DOMAIN = f"{_supabase_host}/storage/v1/object/public/{SUPABASE_BUCKET}"
+    AWS_S3_URL_PROTOCOL = "https:"
+    STORAGES["default"] = {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.Customer"
@@ -89,8 +149,8 @@ LOGIN_REDIRECT_URL = "properties:list"
 LOGOUT_REDIRECT_URL = "properties:home"
 
 # Business contact — Call / WhatsApp shown on website
-FATHER_PHONE = os.getenv("FATHER_PHONE", "9834034104").strip() or "9834034104"
-FATHER_WHATSAPP = (os.getenv("FATHER_WHATSAPP", "") or "9834034104").strip() or "9834034104"
+FATHER_PHONE = os.getenv("FATHER_PHONE", "7972926211").strip() or "7972926211"
+FATHER_WHATSAPP = (os.getenv("FATHER_WHATSAPP", "") or "7972926211").strip() or "7972926211"
 FATHER_NAME = os.getenv("FATHER_NAME", "Baba Khatu Shyam Real Estate")
 FATHER_NAME_HI = os.getenv("FATHER_NAME_HI", "बाबा खाटू श्याम रियल इस्टेट")
 FATHER_OWNER = os.getenv("FATHER_OWNER", "Prashant Agarkar")
