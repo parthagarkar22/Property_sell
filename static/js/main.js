@@ -35,11 +35,7 @@
   var ruleList = document.getElementById("pwRules");
   if (passwordInput && confirmInput && ruleList) {
     var checks = {
-      length: function (value) { return value.length >= 8; },
-      upper: function (value) { return /[A-Z]/.test(value); },
-      lower: function (value) { return /[a-z]/.test(value); },
-      digit: function (value) { return /\d/.test(value); },
-      special: function (value) { return /[^A-Za-z0-9]/.test(value); },
+      length: function (value) { return value.length >= 6; },
       match: function (value) { return value.length > 0 && value === confirmInput.value; },
     };
 

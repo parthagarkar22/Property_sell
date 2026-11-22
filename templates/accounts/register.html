@@ -24,16 +24,12 @@
         <label for="password" data-i18n="label_password">Password</label>
         <div class="pw-field">
           <input type="password" id="password" name="password" required
-                 autocomplete="new-password" data-i18n-placeholder="ph_password" placeholder="Strong password"
+                 minlength="6" autocomplete="new-password" data-i18n-placeholder="ph_password" placeholder="At least 6 characters"
                  aria-describedby="pwRules">
           {% include "includes/password_toggle.html" with target="password" %}
         </div>
         <ul class="pw-rules" id="pwRules">
-          <li data-rule="length" data-i18n="pw_len">At least 8 characters</li>
-          <li data-rule="upper" data-i18n="pw_upper">One uppercase letter (A–Z)</li>
-          <li data-rule="lower" data-i18n="pw_lower">One lowercase letter (a–z)</li>
-          <li data-rule="digit" data-i18n="pw_digit">One number (0–9)</li>
-          <li data-rule="special" data-i18n="pw_special">One special character (!@#$)</li>
+          <li data-rule="length" data-i18n="pw_len">At least 6 characters</li>
         </ul>
       </div>
       <div class="form-group">

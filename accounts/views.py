@@ -1,5 +1,3 @@
-import re
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
@@ -15,21 +13,10 @@ def _valid_phone(phone: str) -> bool:
     return bool(phone) and len(phone) == 10 and phone.isdigit() and phone[0] in "6789"
 
 
-def _strong_password_error(password: str, user=None) -> str | None:
-    """Return one message if the password is not strong enough."""
-    missing = []
-    if len(password) < 8:
-        missing.append("at least 8 characters")
-    if not re.search(r"[A-Z]", password):
-        missing.append("one uppercase letter")
-    if not re.search(r"[a-z]", password):
-        missing.append("one lowercase letter")
-    if not re.search(r"\d", password):
-        missing.append("one number")
-    if not re.search(r"[^A-Za-z0-9]", password):
-        missing.append("one special character (such as ! @ # $)")
-    if missing:
-        return "Use a strong password with " + ", ".join(missing) + "."
+def _password_error(password: str, user=None) -> str | None:
+    """Return a message when the password is shorter than 6 characters."""
+    if len(password) < 6:
+        return "Password must be at least 6 characters."
     try:
         validate_password(password, user=user)
     except ValidationError as exc:
@@ -61,7 +48,7 @@ def register(request):
             messages.error(request, "Passwords do not match.")
             return render(request, "accounts/register.html", ctx)
 
-        password_error = _strong_password_error(
+        password_error = _password_error(
             password, user=Customer(phone=phone, name=name)
         )
         if password_error:
