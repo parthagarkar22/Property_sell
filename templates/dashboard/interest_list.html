@@ -25,18 +25,25 @@
       <a class="dash-btn dash-btn-brand" href="tel:+91{{ i.customer.phone }}">📞 Call</a>
       <a class="dash-btn dash-btn-outline" href="https://wa.me/91{{ i.customer.phone }}" target="_blank" rel="noopener">WhatsApp</a>
     </p>
-    <form method="post" action="{% url 'dashboard:interest_status' i.pk %}" style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:end">
-      {% csrf_token %}
-      <div style="flex:1;min-width:160px">
-        <label for="status-{{ i.pk }}"><strong>Status</strong></label>
-        <select class="dash-input dash-status" name="status" id="status-{{ i.pk }}">
-          {% for value, label in status_choices %}
-            <option value="{{ value }}" {% if i.status == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <button type="submit" class="dash-btn dash-btn-primary">Update</button>
-    </form>
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:end">
+      <form method="post" action="{% url 'dashboard:interest_status' i.pk %}" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:end;flex:1;min-width:220px">
+        {% csrf_token %}
+        <div style="flex:1;min-width:160px">
+          <label for="status-{{ i.pk }}"><strong>Status</strong></label>
+          <select class="dash-input dash-status" name="status" id="status-{{ i.pk }}">
+            {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if i.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="dash-btn dash-btn-primary">Update</button>
+      </form>
+      <form method="post" action="{% url 'dashboard:interest_delete' i.pk %}" onsubmit="return confirm('Delete this customer interest? This cannot be undone.');" style="margin:0">
+        {% csrf_token %}
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+        <button type="submit" class="dash-btn dash-btn-danger">Delete</button>
+      </form>
+    </div>
   </div>
   {% endfor %}
 {% else %}

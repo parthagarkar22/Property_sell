@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from properties.message_parser import parse_property_message
@@ -304,3 +305,17 @@ def interest_update_status(request, pk):
     if next_url.startswith("/"):
         return redirect(next_url)
     return redirect("dashboard:interest_list")
+
+
+@broker_required
+@require_POST
+def interest_delete(request, pk):
+    interest = get_object_or_404(Interest.objects.select_related("customer"), pk=pk)
+    name = interest.customer.name
+    interest.delete()
+    messages.success(request, f"Deleted interest from {name}.")
+    status = request.POST.get("status", "").strip()
+    url = reverse("dashboard:interest_list")
+    if status in Interest.Status.values:
+        url = f"{url}?status={status}"
+    return redirect(url)

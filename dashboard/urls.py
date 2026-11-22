@@ -22,4 +22,5 @@ urlpatterns = [
     path("images/<int:pk>/primary/", views.image_set_primary, name="image_set_primary"),
     path("interests/", views.interest_list, name="interest_list"),
     path("interests/<int:pk>/status/", views.interest_update_status, name="interest_status"),
+    path("interests/<int:pk>/delete/", views.interest_delete, name="interest_delete"),
 ]
